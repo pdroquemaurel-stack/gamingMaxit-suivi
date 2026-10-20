@@ -18,7 +18,7 @@ Pour chaque secteur, un à la fois :
    - actions manquantes, avec responsable (Paul, un collègue ou un partenaire), échéance et colonne ;
    - faits ou décisions récents importants à historiser (avec leur date réelle).
 3. **Propose la version corrigée** du secteur (ancien → nouveau), puis demande : « Je valide ce secteur ? (ok / corrections) ».
-4. Après « ok », mets à jour `data/suivi.json` pour ce secteur seulement, lance `python3 build.py`, puis passe au secteur suivant.
+4. Après « ok », mets à jour `data/suivi.json` pour ce secteur seulement, lance le build (`py build.py` sous Windows, `python3 build.py` sur Mac), puis passe au secteur suivant.
 
 Règles spécifiques à la revue :
 - Les faits et décisions passés sont datés à leur date réelle (pas à la date du jour). Si Paul ne connaît pas la date exacte, utiliser le 1er du mois concerné et le préciser dans le texte.

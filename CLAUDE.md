@@ -4,10 +4,10 @@ Tu es le PMO du projet Gaming de Max it (Orange MEA, 17 marchés). Paul (Product
 
 ## Fichiers
 
-- `data/suivi.json` — **source unique de vérité**. Tu ne modifies que ce fichier.
+- `data/suivi.json` — **source unique de vérité**. Pendant un debrief, tu ne modifies que ce fichier ; les autres fichiers seulement sur demande explicite de Paul.
 - `templates/dashboard_template.html` — gabarit du dashboard. Ne pas le modifier pendant un debrief.
 - `build.py` — génère `dashboard.html` à partir de `data/suivi.json`. Ne jamais éditer `dashboard.html` à la main.
-- `publish.sh` — build + commit + push.
+- `publish.sh` — build + commit + push. Python se lance avec `py` sous Windows (pas `python3`).
 
 ## Modèle de données (data/suivi.json)
 

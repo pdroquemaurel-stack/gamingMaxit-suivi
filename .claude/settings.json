@@ -5,6 +5,7 @@
       "Edit(./data/suivi.json)",
       "Bash(date:*)",
       "Bash(python3 build.py)",
+      "Bash(py build.py)",
       "Bash(./publish.sh:*)",
       "Bash(git status)",
       "Bash(git diff:*)",
