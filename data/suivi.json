@@ -259,9 +259,9 @@
       "date": "2026-10-14",
       "secteur": "PLAY",
       "type": "action",
-      "texte": "Retour sur la possibilité de tester une stack Google Ads de test sur TCMPP",
+      "texte": "Retour sur la possibilité d'utiliser une stack Google Ads de test pour tester l'intégration dans TCMPP avec les mini apps MiniGames",
       "owner": "Quentin",
-      "echeance": null,
+      "echeance": "2026-10-23",
       "statut": "prevu",
       "ferme_le": null
     },
