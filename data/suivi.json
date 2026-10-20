@@ -479,6 +479,39 @@
       "echeance": null,
       "statut": "a_planifier",
       "ferme_le": null
+    },
+    {
+      "id": "I049",
+      "date": "2026-10-20",
+      "secteur": "ESPORT",
+      "type": "action",
+      "texte": "Workshop vision e-sport avec SAGES Africa (Désiré Koussawo) et Nodwin (Samy Ouerfelli), via Margot Gravelle",
+      "owner": "Paul",
+      "echeance": null,
+      "statut": "fait",
+      "ferme_le": "2026-10-20"
+    },
+    {
+      "id": "I050",
+      "date": "2026-10-20",
+      "secteur": "ESPORT",
+      "type": "action",
+      "texte": "Envoyer une proposition d'accompagnement à l'équipe communication (Muriel)",
+      "owner": "SAGES Africa / Nodwin",
+      "echeance": null,
+      "statut": "a_planifier",
+      "ferme_le": null
+    },
+    {
+      "id": "I051",
+      "date": "2026-10-20",
+      "secteur": "ESPORT",
+      "type": "action",
+      "texte": "Étudier la réutilisation de la Fan zone de la CAN pour diffuser et animer la compétition e-sport Orange sur EA",
+      "owner": "Paul",
+      "echeance": null,
+      "statut": "a_planifier",
+      "ferme_le": null
     }
   ]
 }
