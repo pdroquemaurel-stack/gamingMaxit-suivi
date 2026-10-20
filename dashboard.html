@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gaming Max it — Tableau de bord</title>
+<style>
+  :root {
+    --bg: #000; --panel: #111; --panel-2: #1a1a1a; --line: #262626; --line-2: #333;
+    --text: #fff; --muted: #999; --orange: #FF7900;
+    --vert: #32c850; --amber: #ffb400; --rouge: #e64646; --gris: #666;
+    --radius: 6px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 Arial, Helvetica, sans-serif; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 28px 16px 64px; }
+  .muted { color: var(--muted); } .small { font-size: 12px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
+  .k { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 3px; }
+  .late { color: var(--rouge); font-weight: bold; }
+  .empty { color: var(--muted); padding: 14px 16px; }
+
+  /* En-tête */
+  header { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;
+           padding-bottom: 18px; border-bottom: 4px solid var(--orange); }
+  .eyebrow { font-size: 12px; font-weight: bold; color: var(--orange); text-transform: uppercase; letter-spacing: .08em; }
+  h1 { margin: 6px 0 0; font-size: 30px; }
+  .update { text-align: right; }
+  .update .k { margin-bottom: 4px; }
+  .update .date { font-size: 26px; font-weight: bold; line-height: 1.1; }
+  .update .sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .update.stale .date { color: var(--rouge); }
+  .update .warn { display: inline-block; margin-top: 6px; font-size: 12px; font-weight: bold; color: var(--rouge); }
+
+  /* Onglets */
+  .tabs { position: sticky; top: 0; z-index: 5; background: var(--bg); display: flex; gap: 2px; overflow-x: auto;
+          border-bottom: 1px solid var(--line); margin-bottom: 24px; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { flex: none; background: none; border: 0; border-bottom: 3px solid transparent; color: var(--muted); cursor: pointer;
+         font: inherit; font-size: 14px; padding: 14px 16px 11px; display: flex; align-items: center; gap: 8px; }
+  .tab:hover { color: var(--text); }
+  .tab.on { color: var(--text); border-bottom-color: var(--orange); font-weight: bold; }
+  .tab .rag { width: 8px; height: 8px; border-radius: 50%; }
+  .tab .count { font-size: 11px; font-weight: bold; color: var(--rouge); }
+  .tab-sep { flex: none; width: 1px; background: var(--line-2); margin: 12px 6px; }
+  .panel { display: none; }
+  .panel.on { display: block; }
+
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; margin: 32px 0 12px; display: flex; align-items: baseline; gap: 10px; }
+  h2 small { text-transform: none; letter-spacing: 0; color: var(--muted); font-weight: normal; font-size: 12px; }
+
+  /* Statut RAG */
+  .rag-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: bold; padding: 2px 9px;
+              border-radius: 3px; border: 1px solid currentColor; white-space: nowrap; }
+
+  /* Barre d'avancement */
+  .progress .top { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+  .progress .top b { color: var(--text); }
+  .bar { height: 6px; background: var(--panel-2); border-radius: 3px; margin-top: 6px; overflow: hidden; }
+  .bar i { display: block; height: 100%; background: var(--orange); }
+
+
+  /* Cartes chantiers */
+  .projects { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+  .project { padding: 18px 20px; cursor: pointer; }
+  .project:hover { border-color: var(--line-2); }
+  .project .head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 16px; }
+  .project h3 { margin: 0; font-size: 18px; }
+  .project .row { margin-top: 14px; font-size: 13px; }
+  .project .foot { display: flex; gap: 16px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+  .project .foot b { color: var(--text); }
+  .project .foot .alert b { color: var(--rouge); }
+  .others { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+  .other { padding: 14px 16px; cursor: pointer; }
+  .other:hover { border-color: var(--line-2); }
+  .other .head { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+  .other h3 { margin: 0; font-size: 15px; }
+
+  /* Tables */
+  .scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; background: var(--panel-2); font-weight: normal; }
+  tr:last-child td { border-bottom: 0; }
+  .age { font-weight: bold; white-space: nowrap; }
+  .age.a2 { color: var(--amber); } .age.a3 { color: var(--rouge); }
+  .tag { display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 3px; background: var(--panel-2); color: var(--muted); margin-right: 6px; }
+  .closed-row td { color: var(--muted); }
+  .closed-row .title { text-decoration: line-through; }
+
+  /* Fiche chantier */
+  .summary { padding: 22px 24px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 32px; }
+  @media (max-width: 760px) { .summary { grid-template-columns: 1fr; gap: 20px; } }
+  .summary h3 { margin: 0 0 8px; font-size: 26px; }
+  .summary .meta { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; color: var(--muted); font-size: 13px; }
+  .summary .block { margin-top: 16px; }
+
+  .timeline { display: flex; margin-top: 20px; }
+  .ms { flex: 1; text-align: center; font-size: 11px; color: var(--muted); position: relative; padding: 0 3px; }
+  .ms::before { content: ""; position: absolute; top: 6px; left: -50%; width: 100%; height: 2px; background: var(--line-2); }
+  .ms:first-child::before { display: none; }
+  .ms.done::before { background: var(--orange); }
+  .ms .pt { width: 14px; height: 14px; border-radius: 50%; margin: 0 auto 6px; border: 2px solid var(--line-2); background: var(--bg); position: relative; }
+  .ms.done .pt { background: var(--orange); border-color: var(--orange); }
+  .ms.next .pt { border-color: var(--orange); }
+  .ms.done, .ms.next { color: var(--text); }
+
+  /* Fait / Prévu / À prévoir */
+  .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  @media (max-width: 860px) { .board { grid-template-columns: 1fr; } }
+  .col { border-top: 3px solid var(--gris); }
+  .col.done { border-top-color: var(--vert); } .col.plan { border-top-color: var(--orange); }
+  .col .ch { display: flex; justify-content: space-between; align-items: baseline; padding: 14px 16px 2px; }
+  .col .ch b { font-size: 15px; }
+  .col .ch span { font-size: 20px; font-weight: bold; }
+  .col .sub { font-size: 11px; color: var(--muted); padding: 0 16px 6px; }
+  .col ul { list-style: none; margin: 0; padding: 0 16px 10px; }
+  .col li { padding: 10px 0; border-top: 1px solid var(--line); display: flex; gap: 12px; justify-content: space-between; }
+  .col li .info { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .col li .when { flex: none; font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .col li.late .when { color: var(--rouge); font-weight: bold; }
+  .kind { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; padding: 1px 5px; border-radius: 3px; background: var(--panel-2); color: var(--muted); margin-right: 6px; }
+  .kind.ms-kind { color: var(--orange); }
+
+  /* Historique */
+  .filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  .filters button { background: var(--panel); color: var(--muted); border: 1px solid var(--line); border-radius: 3px; padding: 5px 11px; cursor: pointer; font: inherit; font-size: 12px; }
+  .filters button.on { background: var(--orange); border-color: var(--orange); color: #000; font-weight: bold; }
+  details.week { margin-bottom: 8px; }
+  details.week > summary { cursor: pointer; padding: 12px 16px; list-style: none; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+  details.week > summary::-webkit-details-marker { display: none; }
+  details.week > summary b::before { content: "+ "; color: var(--orange); }
+  details.week[open] > summary b::before { content: "– "; }
+  .day { border-top: 1px solid var(--line); padding: 10px 16px 12px; }
+  .day h5 { margin: 0 0 6px; font-size: 13px; color: var(--orange); }
+  .entry { padding: 3px 0; }
+  .entry .kind { min-width: 70px; display: inline-block; text-align: center; }
+  .closed { color: var(--muted); text-decoration: line-through; }
+
+  /* Impression : fond blanc pour diffusion papier ou PDF */
+  @media print {
+    :root { --bg: #fff; --panel: #fff; --panel-2: #f2f2f2; --line: #ddd; --line-2: #bbb; --text: #000; --muted: #555; }
+    .tabs, .filters { display: none; }
+    .panel { display: block !important; break-before: page; }
+    .panel:first-of-type { break-before: auto; }
+    details.week { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">Orange MEA · Max it</div>
+      <h1>Gaming — Tableau de bord projet</h1>
+    </div>
+    <div class="update" id="update"></div>
+  </header>
+
+  <nav class="tabs" id="tabs"></nav>
+  <main id="panels"></main>
+</div>
+
+<script>
+const DATA = {"meta": {"projet": "Gaming Max it — OMEA", "maj": "2026-10-20"}, "secteurs": [{"id": "PLAY", "nom": "Play", "type": "chantier", "statut": "orange", "objectif": "Mini-jeux H5 dans Max it — POC 10 pays, rev-share 50/50 puis 70/30", "prochaine_etape": "Sélection du partenaire et finalisation contractuelle, puis lancement en production", "jalons": [{"texte": "Évaluation des catalogues partenaires", "date": null, "fait": true}, {"texte": "Backlog MVP chiffré", "date": "2026-10-14", "fait": true}, {"texte": "Premiers jeux intégrés en QA", "date": "2026-10-19", "fait": true}, {"texte": "Intégration réussie de la stack ads", "date": null, "fait": false}, {"texte": "Lancement en production", "date": null, "fait": false}]}, {"id": "SHOP", "nom": "Shop", "type": "chantier", "statut": "orange", "objectif": "Shop gaming (passes, vouchers, IAP) — fournisseurs de contenu et shop interne, Wave 1 OCI, OBF, OCM", "prochaine_etape": "Stabiliser le modèle Swarmio (rev-share vs achat-revente) ; backlog Jira du shop interne ; évaluation d'autres fournisseurs ; intégration des e-cards OLinks", "jalons": [{"texte": "Validation de la vision Shop au CODIR", "date": "2026-10-13", "fait": true}, {"texte": "Backlog Jira du shop interne", "date": null, "fait": false}, {"texte": "Fournisseur de contenu identifié", "date": null, "fait": false}, {"texte": "Développement de la section Shop", "date": null, "fait": false}, {"texte": "Lancement Wave 1", "date": null, "fait": false}]}, {"id": "ESPORT", "nom": "E-sport", "type": "chantier", "statut": "rouge", "objectif": "Plateforme de tournois freemium et mécanique Orange Points", "prochaine_etape": "Clôturer le lot 1 du RFP ; démo de la maquette", "jalons": [{"texte": "Proposition de valeur validée", "date": null, "fait": false}, {"texte": "Backlog Jira de la plateforme", "date": null, "fait": false}, {"texte": "Maquettage plateforme", "date": null, "fait": false}, {"texte": "Développement plateforme", "date": null, "fait": false}, {"texte": "Linking avec les jeux", "date": null, "fait": false}, {"texte": "Organisation du premier tournoi", "date": null, "fait": false}]}, {"id": "PART", "nom": "Partenariats", "type": "transverse", "statut": "orange", "objectif": "EA, Supercell, Garena, Carry1st, DV", "prochaine_etape": "Deck partenariats : besoins, offre Max it, business models", "jalons": []}, {"id": "PILOT", "nom": "Pilotage", "type": "transverse", "statut": "vert", "objectif": "CODIR, weekly du mercredi, bascule sur Jira, étude Cruiser Divertissement", "prochaine_etape": "Mail de pré-meeting du mardi", "jalons": []}, {"id": "AUTRE", "nom": "Autres sujets", "type": "transverse", "statut": "gris", "objectif": "Pay Per Download, bundles data gaming", "prochaine_etape": "Valider le principe de zero-rating", "jalons": []}], "items": [{"id": "I005", "date": "2026-10-20", "secteur": "ESPORT", "type": "blocage", "texte": "RFP lot 1 non clôturé (validation technique + engagement budgétaire)", "impact": "StriveCloud attend une décision depuis plus d'un an", "owner": "Ibrahim / Fatima", "statut": "ouvert", "ferme_le": null}, {"id": "I010", "date": "2026-10-14", "secteur": "PART", "type": "action", "texte": "Construire la matrice partenariat pour les équipes de Sofia : supports demandés aux partenaires, mode de réaction en cas de problème (escalade, responsabilités)", "owner": "Paul", "echeance": "2026-10-23", "statut": "prevu", "ferme_le": null}, {"id": "I011", "date": "2026-10-14", "secteur": "PART", "type": "action", "texte": "Suivre le chantier d'intégration des partenaires avec Mohamed Boufnichel", "owner": "Paul", "echeance": null, "statut": "a_planifier", "ferme_le": null}, {"id": "I012", "date": "2026-10-14", "secteur": "SHOP", "type": "decision", "texte": "Pas de panier au lancement (proposition de Nawfel) ; observer le comportement d'achat (plusieurs achats par session) pour estimer le besoin de l'ajouter"}, {"id": "I013", "date": "2026-10-14", "secteur": "SHOP", "type": "action", "texte": "Suivre le comportement d'achat après lancement pour statuer sur l'ajout d'un panier", "owner": "Paul", "echeance": null, "statut": "a_planifier", "ferme_le": null}, {"id": "I014", "date": "2026-10-14", "secteur": "ESPORT", "type": "action", "texte": "Refondre la proposition de valeur e-sport (document en cours) : 5 cibles — joueurs (hardcore, mass market), spectateurs (suivi d'équipes, streaming d'events, streamers sans exclusivité), organisateurs (full stack : organisation, animation, commercialisation, diffusion), sponsors (pub, rewards, marketplace), éditeurs (communauté, lien Shop)", "owner": "Paul", "echeance": "2026-10-22", "statut": "prevu", "ferme_le": null}, {"id": "I015", "date": "2026-10-14", "secteur": "PLAY", "type": "action", "texte": "Backlog redécoupé en MVP / V2 / V3", "owner": "Paul", "echeance": null, "statut": "fait", "ferme_le": "2026-10-14"}, {"id": "I016", "date": "2026-10-14", "secteur": "PLAY", "type": "action", "texte": "Première estimation de la squad dev : 25 JH front + 35 JH back, soit environ 3 semaines", "owner": "Paul", "echeance": null, "statut": "fait", "ferme_le": "2026-10-14"}, {"id": "I017", "date": "2026-10-14", "secteur": "PLAY", "type": "action", "texte": "Ajouter 3 epics au backlog : offre offline, performance globale, publicité", "owner": "Paul", "echeance": null, "statut": "a_planifier", "ferme_le": null}, {"id": "I018", "date": "2026-10-14", "secteur": "PLAY", "type": "action", "texte": "Programmer la réunion tracking plan avec les équipes Data et QS (s'inspirer du travail de Mehdi Frascou sur les KPI business IA)", "owner": "Paul", "echeance": null, "statut": "a_planifier", "ferme_le": null}, {"id": "I020", "date": "2026-10-14", "secteur": "PLAY", "type": "action", "texte": "Retour sur la possibilité de tester une stack Google Ads de test sur TCMPP", "owner": "Quentin", "echeance": null, "statut": "prevu", "ferme_le": null}, {"id": "I021", "date": "2026-10-14", "secteur": "PLAY", "type": "action", "texte": "Envoyer un mail à Fatima et Linda pour présenter le projet publicité et lister les partenaires", "owner": "Paul", "echeance": null, "statut": "a_planifier", "ferme_le": null}, {"id": "I023", "date": "2026-10-14", "secteur": "PLAY", "type": "blocage", "texte": "Pas de position possible sur la publicité sans visibilité sur le flux de données", "impact": "Ce qui se passe au clic sur la mini app et la réception du PRAA restent à renseigner", "owner": "Paul", "statut": "ouvert", "ferme_le": null}, {"id": "I024", "date": "2026-10-19", "secteur": "PLAY", "type": "action", "texte": "Échange avec MiniGames : demande des éléments nécessaires à la due diligence", "owner": "Paul", "echeance": null, "statut": "fait", "ferme_le": "2026-10-19"}, {"id": "I025", "date": "2026-10-19", "secteur": "PLAY", "type": "action", "texte": "Intégration de 4 jeux MiniGames dans la version QA de Max it", "owner": "Paul", "echeance": null, "statut": "fait", "ferme_le": "2026-10-19"}, {"id": "I026", "date": "2026-10-20", "secteur": "PLAY", "type": "action", "texte": "Premier échange de présentation avec Linda (DPO)", "owner": "Paul", "echeance": null, "statut": "fait", "ferme_le": null}, {"id": "I027", "date": "2026-10-20", "secteur": "PLAY", "type": "action", "texte": "Réponse sur le rev-share", "owner": "MiniGames", "echeance": "2026-10-23", "statut": "prevu", "ferme_le": null}, {"id": "I028", "date": "2026-10-20", "secteur": "PLAY", "type": "action", "texte": "Compléter le document PRA partagé par la DPO", "owner": "Paul", "echeance": "2026-10-21", "statut": "prevu", "ferme_le": null}, {"id": "I029", "date": "2026-10-20", "secteur": "PLAY", "type": "action", "texte": "Réunion avec la DPO à CNS, avec Quentin", "owner": "Paul", "echeance": "2026-10-22", "statut": "prevu", "ferme_le": null}, {"id": "I030", "date": "2026-10-14", "secteur": "PLAY", "type": "blocage", "texte": "Format d'intégration non décidé : mini app (déployable sur Max it 1.0, risque de régression UX) ou dev natif", "impact": "Conditionne l'estimation de la squad (25 + 35 JH)", "owner": "Paul", "statut": "ouvert", "ferme_le": null}, {"id": "I031", "date": "2026-10-20", "secteur": "PLAY", "type": "blocage", "texte": "En attente de la stack publicitaire de Quentin (via Orange France)", "impact": "Bloque les tests de monétisation publicitaire", "owner": "Quentin", "statut": "ouvert", "ferme_le": null}, {"id": "I039", "date": "2026-10-20", "secteur": "PLAY", "type": "action", "texte": "Upload du backlog dans Jira", "owner": "Paul", "echeance": "2026-10-23", "statut": "prevu", "ferme_le": null}, {"id": "I040", "date": "2026-10-20", "secteur": "PLAY", "type": "blocage", "texte": "Attente des équipes juridiques sur le positionnement de la publicité", "impact": null, "owner": "Équipes juridiques", "statut": "ouvert", "ferme_le": null}, {"id": "I041", "date": "2026-10-13", "secteur": "SHOP", "type": "action", "texte": "Stratégie Gaming Shop présentée en CODIR", "owner": "Paul", "echeance": null, "statut": "fait", "ferme_le": "2026-10-13"}, {"id": "I042", "date": "2026-10-20", "secteur": "SHOP", "type": "action", "texte": "Document UX/UI du Shop réalisé", "owner": "Paul", "echeance": null, "statut": "fait", "ferme_le": null}, {"id": "I043", "date": "2026-10-20", "secteur": "SHOP", "type": "action", "texte": "Partager avec Nawfel et Yassine le document pour le maquettage", "owner": "Paul", "echeance": "2026-10-20", "statut": "prevu", "ferme_le": null}, {"id": "I044", "date": "2026-10-20", "secteur": "SHOP", "type": "action", "texte": "Demander le catalogue pricé de Swarmio", "owner": "Jean-Noël", "echeance": "2026-10-23", "statut": "prevu", "ferme_le": null}, {"id": "I045", "date": "2026-10-20", "secteur": "SHOP", "type": "action", "texte": "Programmer la réunion tracking plan avec les équipes Data et QS (s'inspirer du travail de Mehdi Frascou sur les KPI business IA)", "owner": "Paul", "echeance": null, "statut": "a_planifier", "ferme_le": null}, {"id": "I046", "date": "2026-10-20", "secteur": "SHOP", "type": "blocage", "texte": "Identifier des fournisseurs de contenu", "impact": null, "owner": "Paul", "statut": "ouvert", "ferme_le": null}, {"id": "I047", "date": "2026-10-20", "secteur": "ESPORT", "type": "action", "texte": "Refaire le backlog", "owner": "Paul", "echeance": null, "statut": "a_planifier", "ferme_le": null}, {"id": "I048", "date": "2026-10-20", "secteur": "ESPORT", "type": "action", "texte": "Créer le document UX pour le maquettage", "owner": "Paul", "echeance": null, "statut": "a_planifier", "ferme_le": null}]};
+const today = DATA.meta.maj;
+
+const STATUT = {
+  vert:   { lbl: "Sous contrôle", c: "var(--vert)" },
+  orange: { lbl: "Vigilance",     c: "var(--amber)" },
+  rouge:  { lbl: "Critique",      c: "var(--rouge)" },
+  gris:   { lbl: "Non démarré",   c: "var(--gris)" }
+};
+const TYPES = { fait: "Fait", decision: "Décision", sujet: "Nouveau sujet", action: "Action", blocage: "Blocage" };
+
+/* ---------- Utilitaires ---------- */
+function esc(s) {
+  return String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+function days(a, b) { return Math.round((new Date(b) - new Date(a)) / 86400000); }
+function fmt(d) { return d ? new Date(d + "T00:00:00").toLocaleDateString("fr-FR", { day: "2-digit", month: "short" }) : "—"; }
+function fmtLong(d) { return new Date(d + "T00:00:00").toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" }); }
+function secteur(id) { return DATA.secteurs.find(x => x.id === id); }
+function rag(st) { const s = STATUT[st]; return `<span class="rag-chip" style="color:${s.c}">${s.lbl}</span>`; }
+
+function isoWeek(dateStr) {
+  const d = new Date(dateStr + "T00:00:00Z");
+  const day = d.getUTCDay() || 7;
+  const monday = new Date(d); monday.setUTCDate(d.getUTCDate() - day + 1);
+  const thursday = new Date(d); thursday.setUTCDate(d.getUTCDate() + 4 - day);
+  const start = new Date(Date.UTC(thursday.getUTCFullYear(), 0, 1));
+  const n = Math.ceil(((thursday - start) / 86400000 + 1) / 7);
+  return { key: "S" + String(n).padStart(2, "0") + " " + thursday.getUTCFullYear(), monday: monday.toISOString().slice(0, 10) };
+}
+
+function progress(s) {
+  const j = s.jalons || [];
+  const done = j.filter(n => n.fait).length;
+  return { done, total: j.length, pct: j.length ? Math.round(done / j.length * 100) : 0 };
+}
+function progressHtml(s) {
+  const p = progress(s);
+  return `<div class="progress"><div class="top"><span>Avancement (jalons franchis)</span><b>${p.done}/${p.total} · ${p.pct}%</b></div><div class="bar"><i style="width:${p.pct}%"></i></div></div>`;
+}
+
+const items = DATA.items;
+// Ouvert : blocage non levé, ou action non terminée
+const open = (type, sid) => items.filter(i => i.type === type && (type === "action" ? i.statut !== "fait" : i.statut === "ouvert") && (!sid || i.secteur === sid));
+const chantiers = DATA.secteurs.filter(s => s.type === "chantier");
+const transverses = DATA.secteurs.filter(s => s.type !== "chantier");
+
+/* ---------- Date de mise à jour ---------- */
+(function renderUpdate() {
+  const now = new Date(); now.setHours(0, 0, 0, 0);
+  const age = Math.max(0, days(today, now.toISOString().slice(0, 10)));
+  const ageTxt = age === 0 ? "aujourd'hui" : age === 1 ? "hier" : `il y a ${age} jours`;
+  const el = document.getElementById("update");
+  if (age > 3) el.classList.add("stale");
+  el.innerHTML = `<div class="k">Dernière mise à jour</div>
+    <div class="date">${new Date(today + "T00:00:00").toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</div>
+    <div class="sub">${ageTxt} · semaine ${isoWeek(today).key}</div>
+    ${age > 3 ? `<div class="warn">Suivi non mis à jour depuis plus de 3 jours</div>` : ""}`;
+})();
+
+/* ---------- Table des blocages ---------- */
+function blockersTable(sid) {
+  const list = open("blocage", sid).sort((a, b) => a.date.localeCompare(b.date))
+    .concat(items.filter(i => i.type === "blocage" && i.statut === "ferme" && (!sid || i.secteur === sid) && days(i.ferme_le, today) <= 14));
+  if (!list.length) return `<div class="card empty">Aucun point de blocage.</div>`;
+  return `<div class="scroll"><table>
+    <tr><th>Ancienneté</th><th>Point de blocage</th>${sid ? "" : "<th>Chantier</th>"}<th>Impact</th><th>Arbitrage / déblocage attendu de</th></tr>
+    ${list.map(b => {
+      if (b.statut === "ferme") {
+        return `<tr class="closed-row"><td>Levé le ${fmt(b.ferme_le)}</td><td class="title">${esc(b.texte)}</td>${sid ? "" : `<td>${esc(secteur(b.secteur).nom)}</td>`}<td>${esc(b.impact)}</td><td>${esc(b.owner)}</td></tr>`;
+      }
+      const age = days(b.date, today);
+      return `<tr><td class="age ${age > 14 ? "a3" : age > 7 ? "a2" : ""}">${age} j</td>
+        <td><b>${esc(b.texte)}</b><div class="small muted">ouvert le ${fmt(b.date)}</div></td>
+        ${sid ? "" : `<td>${esc(secteur(b.secteur).nom)}</td>`}
+        <td>${esc(b.impact)}</td>
+        <td>${b.owner ? esc(b.owner) : '<span class="late">À désigner</span>'}</td></tr>`;
+    }).join("")}
+  </table></div>`;
+}
+
+/* ---------- Réalisé / Prévu / À planifier : actions uniquement ---------- */
+function boardHtml(s) {
+  const acts = items.filter(i => i.secteur === s.id && i.type === "action");
+  const li = (a, when, late) =>
+    `<li class="${late ? "late" : ""}"><div>${esc(a.texte)}<div class="info">${esc(a.owner)}</div></div>${when ? `<span class="when">${when}</span>` : ""}</li>`;
+
+  const done = acts.filter(a => a.statut === "fait")
+    .sort((a, b) => (b.ferme_le || "").localeCompare(a.ferme_le || ""))
+    .map(a => li(a, a.ferme_le ? fmt(a.ferme_le) : ""));
+  const planned = acts.filter(a => a.statut === "prevu")
+    .sort((a, b) => (a.echeance || "9999").localeCompare(b.echeance || "9999"))
+    .map(a => { const late = a.echeance && a.echeance < today; return li(a, a.echeance ? fmt(a.echeance) + (late ? " · en retard" : "") : "date à fixer", late); });
+  const toPlan = acts.filter(a => a.statut === "a_planifier").map(a => li(a, ""));
+
+  const col = (cls, title, sub, list) => `<div class="card col ${cls}">
+    <div class="ch"><b>${title}</b><span>${list.length}</span></div>
+    <div class="sub">${sub}</div>
+    ${list.length ? `<ul>${list.join("")}</ul>` : `<div class="empty small">Aucune action.</div>`}</div>`;
+
+  return `<div class="board">
+    ${col("done", "Réalisé", "Actions terminées", done)}
+    ${col("plan", "Prévu", "Actions engagées, avec leur échéance", planned)}
+    ${col("todo", "À planifier", "Actions identifiées, pas encore lancées", toPlan)}
+  </div>`;
+}
+
+/* ---------- Historique hebdomadaire ---------- */
+const histState = {};
+function historyHtml(key, sid) {
+  return `${sid ? "" : `<div class="filters" data-hist="${key}" data-f="secteur"></div>`}
+          <div class="filters" data-hist="${key}" data-f="type"></div>
+          <div id="weeks-${key}" style="margin-top:10px"></div>`;
+}
+function renderHistory(key, sid) {
+  const st = histState[key] = histState[key] || { secteur: sid || null, type: null };
+  document.querySelectorAll(`[data-hist="${key}"]`).forEach(bar => {
+    const f = bar.dataset.f;
+    const opts = f === "secteur"
+      ? [{ id: null, lbl: "Tous les chantiers" }, ...DATA.secteurs.map(x => ({ id: x.id, lbl: esc(x.nom) }))]
+      : [{ id: null, lbl: "Tous les types" }, ...Object.entries(TYPES).map(([id, lbl]) => ({ id, lbl }))];
+    bar.innerHTML = opts.map(o => `<button class="${o.id === st[f] ? "on" : ""}" data-id="${o.id ?? ""}">${o.lbl}</button>`).join("");
+    bar.querySelectorAll("button").forEach(b => b.onclick = () => { st[f] = b.dataset.id || null; renderHistory(key, sid); });
+  });
+
+  const list = items.filter(i => (!st.secteur || i.secteur === st.secteur) && (!st.type || i.type === st.type));
+  const weeks = {};
+  list.forEach(i => {
+    const w = isoWeek(i.date);
+    weeks[w.monday] = weeks[w.monday] || { key: w.key, days: {} };
+    (weeks[w.monday].days[i.date] = weeks[w.monday].days[i.date] || []).push(i);
+  });
+  const mondays = Object.keys(weeks).sort().reverse();
+  document.getElementById("weeks-" + key).innerHTML = mondays.length ? mondays.map((m, idx) => {
+    const w = weeks[m];
+    const dk = Object.keys(w.days).sort().reverse();
+    const n = dk.reduce((t, d) => t + w.days[d].length, 0);
+    return `<details class="card week" ${idx === 0 ? "open" : ""}>
+      <summary><b>Semaine ${w.key} · du ${fmt(m)}</b><span class="muted small">${dk.length} jour(s) · ${n} élément(s)</span></summary>
+      ${dk.map(d => `<div class="day"><h5>${fmtLong(d)}</h5>` + w.days[d].map(i =>
+        `<div class="entry"><span class="kind">${i.type === "action" && i.statut === "fait" ? "Réalisé" : TYPES[i.type]}</span><span class="${i.statut === "ferme" ? "closed" : ""}">${sid ? "" : `<span class="tag">${esc(secteur(i.secteur).nom)}</span>`}${esc(i.texte)}${i.owner ? ` <span class="muted">— ${esc(i.owner)}${i.echeance ? ", " + fmt(i.echeance) : ""}</span>` : ""}</span></div>`).join("") + `</div>`).join("")}
+    </details>`;
+  }).join("") : `<div class="card empty">Aucun élément pour ce filtre.</div>`;
+}
+
+/* ---------- Synthèse ---------- */
+function overviewHtml() {
+  const project = s => {
+    const nb = open("blocage", s.id).length, na = open("action", s.id).length;
+    return `<div class="card project" data-goto="${s.id}">
+      <div class="head"><h3>${esc(s.nom)}</h3>${rag(s.statut)}</div>
+      ${progressHtml(s)}
+      <div class="row"><div class="k">Prochaine étape</div>${esc(s.prochaine_etape)}</div>
+      <div class="foot"><span class="${nb ? "alert" : ""}"><b>${nb}</b> blocage(s)</span><span><b>${na}</b> action(s) ouverte(s)</span></div>
+    </div>`;
+  };
+  const other = s => {
+    const nb = open("blocage", s.id).length, na = open("action", s.id).length;
+    return `<div class="card other" data-goto="${s.id}">
+      <div class="head"><h3>${esc(s.nom)}</h3>${rag(s.statut)}</div>
+      <div class="small muted" style="margin-top:8px">${esc(s.prochaine_etape)}</div>
+      <div class="small" style="margin-top:8px"><span class="${nb ? "late" : ""}">${nb} blocage(s)</span> · ${na} action(s)</div>
+    </div>`;
+  };
+
+  return `<h2 style="margin-top:4px">Chantiers <small>cliquer pour le détail</small></h2>
+    <section class="projects">${chantiers.map(project).join("")}</section>
+    <h2>Sujets transverses</h2>
+    <section class="others">${transverses.map(other).join("")}</section>
+    <h2>Points de blocage <small>du plus ancien au plus récent</small></h2>
+    ${blockersTable(null)}
+    <h2>Historique hebdomadaire</h2>
+    ${historyHtml("all", null)}`;
+}
+
+/* ---------- Fiche secteur ---------- */
+function secteurHtml(s) {
+  const j = s.jalons || [];
+  const nextIdx = j.findIndex(n => !n.fait);
+  const timeline = j.length ? `<div class="timeline">` + j.map((n, i) =>
+      `<div class="ms ${n.fait ? "done" : ""} ${i === nextIdx ? "next" : ""}"><div class="pt"></div>${esc(n.texte)}<div class="muted">${n.date ? fmt(n.date) : "non daté"}</div></div>`).join("") + `</div>` : "";
+  return `<section class="card summary">
+      <div>
+        <div class="k">${s.type === "chantier" ? "Chantier" : "Sujet transverse"}</div>
+        <h3>${esc(s.nom)}</h3>
+        <div class="meta">${rag(s.statut)}</div>
+        <div class="block"><div class="k">Objectif</div>${esc(s.objectif)}</div>
+        <div class="block"><div class="k">Prochaine étape</div>${esc(s.prochaine_etape)}</div>
+      </div>
+      <div>${j.length ? progressHtml(s) + timeline : `<div class="k">Jalons</div><div class="small muted">Aucun jalon défini.</div>`}</div>
+    </section>
+    <h2>État d'avancement <small>actions réalisées, prévues, à planifier</small></h2>
+    ${boardHtml(s)}
+    <h2>Points de blocage</h2>
+    ${blockersTable(s.id)}
+    <h2>Historique hebdomadaire</h2>
+    ${historyHtml(s.id, s.id)}`;
+}
+
+/* ---------- Onglets ---------- */
+const tabs = [{ id: "overview", nom: "Synthèse" }, ...chantiers, { sep: true }, ...transverses];
+document.getElementById("tabs").innerHTML = tabs.map(t => {
+  if (t.sep) return `<span class="tab-sep"></span>`;
+  const nb = t.id === "overview" ? 0 : open("blocage", t.id).length;
+  const dot = t.statut ? `<span class="rag" style="background:${STATUT[t.statut].c}"></span>` : "";
+  return `<button class="tab" data-tab="${t.id}">${dot}${esc(t.nom)}${nb ? `<span class="count">${nb} blocage${nb > 1 ? "s" : ""}</span>` : ""}</button>`;
+}).join("");
+
+document.getElementById("panels").innerHTML =
+  `<div class="panel" id="p-overview">${overviewHtml()}</div>` +
+  DATA.secteurs.map(s => `<div class="panel" id="p-${s.id}">${secteurHtml(s)}</div>`).join("");
+
+renderHistory("all", null);
+DATA.secteurs.forEach(s => renderHistory(s.id, s.id));
+
+function show(id) {
+  if (!document.getElementById("p-" + id)) id = "overview";
+  document.querySelectorAll(".panel").forEach(p => p.classList.toggle("on", p.id === "p-" + id));
+  document.querySelectorAll(".tab").forEach(t => {
+    t.classList.toggle("on", t.dataset.tab === id);
+    if (t.dataset.tab === id) t.scrollIntoView({ inline: "center", block: "nearest" });
+  });
+  if (location.hash !== "#" + id) history.replaceState(null, "", "#" + id);
+}
+document.querySelectorAll("[data-tab], [data-goto]").forEach(el =>
+  el.onclick = () => { show(el.dataset.tab || el.dataset.goto); window.scrollTo({ top: 0 }); });
+show(location.hash.slice(1) || "overview");
+</script>
+</body>
+</html>
