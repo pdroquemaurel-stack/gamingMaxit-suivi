@@ -80,7 +80,7 @@
       "type": "chantier",
       "statut": "rouge",
       "objectif": "Plateforme de tournois freemium et mécanique Orange Points",
-      "prochaine_etape": "Clôturer le lot 1 du RFP ; démo de la maquette",
+      "prochaine_etape": "Clôturer le lot 1 du RFP ; démo de la maquette ; préparer la diffusion de l'event EA FC (12–13/12)",
       "jalons": [
         {
           "texte": "Proposition de valeur validée",
@@ -110,6 +110,11 @@
         {
           "texte": "Organisation du premier tournoi",
           "date": null,
+          "fait": false
+        },
+        {
+          "texte": "Diffusion de l'event EA FC dans Max it",
+          "date": "2026-12-12",
           "fait": false
         }
       ]
@@ -422,8 +427,8 @@
       "texte": "Partager avec Nawfel et Yassine le document pour le maquettage",
       "owner": "Paul",
       "echeance": "2026-10-20",
-      "statut": "prevu",
-      "ferme_le": null
+      "statut": "fait",
+      "ferme_le": "2026-10-20"
     },
     {
       "id": "I044",
@@ -507,10 +512,21 @@
       "date": "2026-10-20",
       "secteur": "ESPORT",
       "type": "action",
-      "texte": "Étudier la réutilisation de la Fan zone de la CAN pour diffuser et animer la compétition e-sport Orange sur EA",
+      "texte": "Étudier la diffusion dans Max it de l'event EA FC (12–13/12) et la réutilisation de la Fan zone de la CAN : premier échange avec les équipes Fan zone, UX et TV",
       "owner": "Paul",
+      "echeance": "2026-10-22",
+      "statut": "prevu",
+      "ferme_le": null
+    },
+    {
+      "id": "I052",
+      "date": "2026-10-20",
+      "secteur": "SHOP",
+      "type": "action",
+      "texte": "Retour à Paul sur la présentation du besoin Shop (à partir du document UX/UI partagé)",
+      "owner": "Nawfel",
       "echeance": null,
-      "statut": "a_planifier",
+      "statut": "prevu",
       "ferme_le": null
     }
   ]
