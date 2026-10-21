@@ -1,7 +1,7 @@
 {
   "meta": {
     "projet": "Gaming Max it — OMEA",
-    "maj": "2026-10-20"
+    "maj": "2026-10-21"
   },
   "secteurs": [
     {
@@ -349,7 +349,7 @@
       "type": "action",
       "texte": "Réunion avec la DPO à CNS, avec Quentin",
       "owner": "Paul",
-      "echeance": "2026-10-22",
+      "echeance": "2026-10-28",
       "statut": "prevu",
       "ferme_le": null
     },
