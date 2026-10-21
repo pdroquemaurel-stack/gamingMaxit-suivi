@@ -248,7 +248,7 @@
       "date": "2026-10-14",
       "secteur": "PLAY",
       "type": "action",
-      "texte": "Programmer la réunion tracking plan avec les équipes Data et QS (s'inspirer du travail de Mehdi Frascou sur les KPI business IA)",
+      "texte": "Envoyer le tracking plan Play à QS",
       "owner": "Paul",
       "echeance": null,
       "statut": "a_planifier",
@@ -338,7 +338,7 @@
       "type": "action",
       "texte": "Compléter le document PRA partagé par la DPO",
       "owner": "Paul",
-      "echeance": "2026-10-21",
+      "echeance": "2026-10-22",
       "statut": "prevu",
       "ferme_le": null
     },
@@ -446,7 +446,7 @@
       "date": "2026-10-20",
       "secteur": "SHOP",
       "type": "action",
-      "texte": "Programmer la réunion tracking plan avec les équipes Data et QS (s'inspirer du travail de Mehdi Frascou sur les KPI business IA)",
+      "texte": "Faire le tracking plan Shop",
       "owner": "Paul",
       "echeance": null,
       "statut": "a_planifier",
@@ -526,6 +526,39 @@
       "texte": "Retour à Paul sur la présentation du besoin Shop (à partir du document UX/UI partagé)",
       "owner": "Nawfel",
       "echeance": null,
+      "statut": "prevu",
+      "ferme_le": null
+    },
+    {
+      "id": "I053",
+      "date": "2026-10-21",
+      "secteur": "PLAY",
+      "type": "action",
+      "texte": "Tracking plan Play envoyé à Hafid Oussous et revu ensemble",
+      "owner": "Paul",
+      "echeance": null,
+      "statut": "fait",
+      "ferme_le": "2026-10-21"
+    },
+    {
+      "id": "I054",
+      "date": "2026-10-21",
+      "secteur": "ESPORT",
+      "type": "action",
+      "texte": "Faire le tracking plan E-sport",
+      "owner": "Paul",
+      "echeance": null,
+      "statut": "a_planifier",
+      "ferme_le": null
+    },
+    {
+      "id": "I055",
+      "date": "2026-10-21",
+      "secteur": "PLAY",
+      "type": "action",
+      "texte": "Demander aux équipes UX/UI de mettre à jour la maquette avec les features manquantes pour le MVP",
+      "owner": "Paul",
+      "echeance": "2026-10-23",
       "statut": "prevu",
       "ferme_le": null
     }
