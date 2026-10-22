@@ -1,7 +1,7 @@
 {
   "meta": {
     "projet": "Gaming Max it — OMEA",
-    "maj": "2026-10-21"
+    "maj": "2026-10-22"
   },
   "secteurs": [
     {
@@ -10,7 +10,7 @@
       "type": "chantier",
       "statut": "orange",
       "objectif": "Mini-jeux H5 dans Max it — POC 10 pays, rev-share 50/50 puis 70/30",
-      "prochaine_etape": "Sélection du partenaire et finalisation contractuelle, puis lancement en production",
+      "prochaine_etape": "Avancer en parallèle avec plusieurs partenaires (MiniGames, partenaire WeChat via Tencent) ; finalisation contractuelle, puis lancement en production",
       "jalons": [
         {
           "texte": "Évaluation des catalogues partenaires",
@@ -559,6 +559,24 @@
       "texte": "Demander aux équipes UX/UI de mettre à jour la maquette avec les features manquantes pour le MVP",
       "owner": "Paul",
       "echeance": "2026-10-23",
+      "statut": "prevu",
+      "ferme_le": null
+    },
+    {
+      "id": "I056",
+      "date": "2026-10-22",
+      "secteur": "PLAY",
+      "type": "decision",
+      "texte": "Rev-share MiniGames acté par Jean-Noël : 50/50 au démarrage avec la stack pub du partenaire, puis 70/30 avec la stack pub Orange (2e étape non validée par le partenaire)"
+    },
+    {
+      "id": "I057",
+      "date": "2026-10-22",
+      "secteur": "PLAY",
+      "type": "action",
+      "texte": "Envoyer à Tencent la confirmation de lancement du projet mini-jeux avec le partenaire WeChat, après validation d'Abdou",
+      "owner": "Paul",
+      "echeance": "2026-10-22",
       "statut": "prevu",
       "ferme_le": null
     }
