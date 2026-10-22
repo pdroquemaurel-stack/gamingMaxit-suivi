@@ -579,6 +579,17 @@
       "echeance": "2026-10-22",
       "statut": "prevu",
       "ferme_le": null
+    },
+    {
+      "id": "I058",
+      "date": "2026-10-22",
+      "secteur": "PILOT",
+      "type": "action",
+      "texte": "Présenter la nouvelle stratégie et l'avancement aux pays OCI, OBF et OCM (semaine du 26/10)",
+      "owner": "Paul",
+      "echeance": null,
+      "statut": "prevu",
+      "ferme_le": null
     }
   ]
 }
